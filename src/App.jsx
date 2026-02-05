@@ -9,11 +9,11 @@ function App() {
   ]);
 
   return (
-    <>
+    <div className="container">
+      <h1>🍀 최스카이 투두리스트 🍀</h1>
       <TodoList todoList={todoList} setTodoList={setTodoList} />
-      <hr />
       <TodoInput todoList={todoList} setTodoList={setTodoList} />
-    </>
+    </div>
   );
 }
 
@@ -21,7 +21,7 @@ function TodoInput({ todoList, setTodoList }) {
   const [inputValue, setInputValue] = useState("");
 
   return (
-    <>
+    <div className="input-group">
       <input
         value={inputValue}
         onChange={(event) => setInputValue(event.target.value)}
@@ -36,7 +36,7 @@ function TodoInput({ todoList, setTodoList }) {
       >
         추가하기
       </button>
-    </>
+    </div>
   );
 }
 
@@ -51,30 +51,52 @@ function TodoList({ todoList, setTodoList }) {
 }
 
 function Todo({ todo, setTodoList }) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(todo.content);
+  const [isEditing, setEditing] = useState(false);
+
   return (
-    <li>
-      {todo.content}
+    <li className="todo-item">
       <input
-        value={inputValue}
-        onChange={(event) => setInputValue(event.target.value)}
-      />
-      <button
-        onClick={() => {
+        type="checkbox"
+        checked={todo.isDone || false}
+        onChange={() => {
           setTodoList((prev) =>
             prev.map((el) =>
-              el.id === todo.id ? { ...el, content: inputValue } : el
-            )
+              el.id === todo.id ? { ...el, isDone: !el.isDone } : el,
+            ),
           );
         }}
-      >
-        수정
-      </button>
+      />
+
+      {isEditing ? (
+        <input
+          value={inputValue}
+          onChange={(event) => setInputValue(event.target.value)}
+        />
+      ) : (
+        <span className={`todo-text ${todo.isDone ? "done" : ""}`}>
+          {todo.content}
+        </span>
+      )}
+
       <button
         onClick={() => {
-          setTodoList((prev) => {
-            return prev.filter((el) => el.id !== todo.id);
-          });
+          if (isEditing) {
+            setTodoList((prev) =>
+              prev.map((el) =>
+                el.id === todo.id ? { ...el, content: inputValue } : el,
+              ),
+            );
+          }
+          setIsEditing(!isEditing);
+        }}
+      >
+        {isEditing ? "저장" : "수정"}
+      </button>
+
+      <button
+        onClick={() => {
+          setTodoList((prev) => prev.filter((el) => el.id !== todo.id));
         }}
       >
         삭제
